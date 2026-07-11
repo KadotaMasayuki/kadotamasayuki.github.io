@@ -1,1 +1,2 @@
-# kadotamasayuki.github.io
+# 記事を載せるサイトのつもりなんだが、コレで良いのかな？
+
