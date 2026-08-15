@@ -27,6 +27,12 @@ ffmpeg -i input.mp4 -vf "scale=2000:1500:force_original_aspect_ratio=decrease" o
 
 ※ mp4の場合、縦横どちらかでも奇数だとエラーが出るので、scale=2000:-2 などのようにする必要がある。あとで記載する。
 
+画像ファイルも拡大縮小できる
+```
+ffmpeg -i input.jpg -vf "scale=2000:1500:force_original_aspect_ratio=decrease" output.jpg
+```
+
+
 
 ### 現在のディレクトリ以下を辿り、jpgファイルを縦横比を維持しつつ2000x1500に収まるよう変更する。拡大はしない。出力ファイル名は末尾に'_small'を付けてみた。
 
