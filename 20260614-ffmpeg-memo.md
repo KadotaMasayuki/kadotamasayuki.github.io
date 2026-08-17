@@ -4,7 +4,17 @@
 
 
 
-## 付帯情報：現在のディレクトリ以下のすべてのディレクトリを辿って処理する場合のOSごとの処理。出力ファイル名は末尾に'_output'を付けてみた。
+## 付帯情報
+
+
+### コマンド実行後、ffmpegが色んな情報を吐き出すけど、ffmpegのビルド情報などが不要な時はこれ。出力がすっきりする。
+
+```
+ffmpeg -hide_banner ....
+```
+
+
+### 現在のディレクトリ以下のすべてのディレクトリを辿って処理する場合のOSごとの処理。出力ファイル名は末尾に'_output'を付けてみた。
 
 for windows(.bat) - バッチファイルにするときは%%iにしなければいけないような気がする。未確認。
 ```
@@ -18,37 +28,62 @@ find . -type f -name "*.mp4" -exec sh -c 'ffmpeg -i "$0"  (何かのフィルタ
 
 
 
+## いろんなソフトで開ける動画にする（コンパチビリティ重視）
+
+色々指定しているけれど、気を付けるところは Baseline MP4, AAC かな。
+
+```
+ffmpeg   -i input.mp4   -c:v libx264   -crf 23   -preset medium   -pix_fmt yuv420p   -profile:v baseline   -level 3.1   -bf 0   -refs 1   -c:a aac  -ar 44100   output.mp4
+```
+
+これに、
+
+- -r 30 --- 映像秒間30フレーム
+- -vf "scale=1920x1080:force_original_aspect_ratio=decrease:force_divisible_by=2" --- 映像縦横サイズ
+- -b:a 64k --- 音声ビットレート64kbps
+- -ac 2 --- 音声2チャンネル
+
+などを付けて好みの動画にする。
+たとえば
+
+```
+ffmpeg   -hide_banner   -i input.mp4   -r 30   -vf "scale=1920x1080:force_original_aspect_ratio=decrease:force_divisible_by=2"   -c:v libx264   -crf 23   -preset medium   -pix_fmt yuv420p   -profile:v baseline   -level 3.1   -bf 0   -refs 1   -c:a aac  -b:a 64k  -ar 44100   -ac 2   output.mp4
+```
+
+
 
 ## 画面サイズを変更する。縦横比を維持、指定サイズに収まるよう縮小する。拡大はしない。
 
+動画ファイルの場合、mp4では、縦横どちらかでも奇数だとエラーが出るので、vf内でforce_divisible_by=2 で偶数にする。
+scale=2000:-2 や、 scale=-2:1500 などのように、縦横どちらかのみ指定してアスペクト比追従させて偶数にする記法もあるようだが、force_divisible_by=2のほうがシンプルだと思う。
 ```
-ffmpeg -i input.mp4 -vf "scale=2000:1500:force_original_aspect_ratio=decrease" output.mp4
+ffmpeg -i input.mp4 -vf "scale=2000x1500:force_original_aspect_ratio=decrease:force_divisible_by=2" output.mp4
 ```
 
-※ mp4の場合、縦横どちらかでも奇数だとエラーが出るので、scale=2000:-2 などのようにする必要がある。あとで記載する。
 
-画像ファイルも拡大縮小できる
+画像ファイルも拡大縮小できる。
+画像は縦横の画素数が奇数になっても良いのでforce_divisible_by=2は不要。
 ```
-ffmpeg -i input.jpg -vf "scale=2000:1500:force_original_aspect_ratio=decrease" output.jpg
+ffmpeg -i input.jpg -vf "scale=2000x1500:force_original_aspect_ratio=decrease" output.jpg
 ```
 
 
 
 ### 現在のディレクトリ以下を辿り、jpgファイルを縦横比を維持しつつ2000x1500に収まるよう変更する。拡大はしない。出力ファイル名は末尾に'_small'を付けてみた。
 
-for windows(.bat) - 未確認
-```
-for /R %i in (*.jpg) do ffmpeg -i "%i" --vf "scale=2000:1500:force_original_aspect_ratio=decrease" "%~dpni_small.jpg"
-```
-
 for Linux(.sh)
 ```
 find . -type f -name "*.jpg" -exec sh -c 'ffmpeg -i "$0" -vf "scale=2000:1500:force_original_aspect_ratio=decrease" "${0%.jpg}_small.jpg"' {} \;
 ```
 
+for windows(.bat) - 未確認
+```
+for /R %i in (*.jpg) do ffmpeg -i "%i" --vf "scale=2000:1500:force_original_aspect_ratio=decrease" "%~dpni_small.jpg"
+```
 
 
-## メタデータの関係で警告が出るのをなんとかする
+
+## ファイルを開いた時にメタデータの関係で警告が出るのをなんとかする
 
 映像・音声を再エンコードすることなくffmpegで出力するだけで整理されることがある。
 ```
@@ -76,7 +111,7 @@ ffmpeg -ss 100 -t 10 -i input.mp4 output.mp4
 
 
 
-## 指定時刻の画像を保存
+## 指定時刻のフレームを画像として保存
 
 開始100秒のフレームを画像として保存
 ```
