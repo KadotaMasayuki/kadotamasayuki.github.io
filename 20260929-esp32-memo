@@ -5,7 +5,7 @@
 ### USBの場合
 
 ESP32-S* を使う。ESP32-C* でも出来るようだが・・
-(Are XIAO ESP32C3 or XIAO ESP32S3 capable of acting as USB HID devices?)[https://forum.seeedstudio.com/t/are-xiao-esp32c3-or-xiao-esp32s3-capable-of-acting-as-usb-hid-devices/270505]
+[Are XIAO ESP32C3 or XIAO ESP32S3 capable of acting as USB HID devices?](https://forum.seeedstudio.com/t/are-xiao-esp32c3-or-xiao-esp32s3-capable-of-acting-as-usb-hid-devices/270505)
 
 ### Bluetoothの場合
 
